@@ -1,0 +1,125 @@
+:root {
+  --color-principal: #45446d;
+  --color-secundario: #8e77aa;
+  --color-texto: #ecf3f2;
+  --fuente-principal: 'Poppins', sans-serif;
+  --espaciado: 1rem;
+}
+
+body {
+  font-family: var(--fuente-principal);
+  color: var(--color-texto);
+  background-color: #060a0a;
+  min-height: 100vh;
+  padding-top: 70px;
+  margin: 0;
+  flex-direction: column;
+  display: flex;
+}
+
+header {
+  background-color: var(--color-principal);
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  padding: var(--espaciado);
+  width: 100%;
+  text-align: center;
+}
+
+aside {
+  background-color: var(--color-secundario);
+  padding: 1rem;
+  border-radius: 10px;
+  flex: 0 0 220px;
+  height: fit-content;
+}
+
+main {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  border-radius: 10px;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: column
+}
+
+#task-list li {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 5px;
+  border-radius: 8px;
+  background-color: #45446d;
+  color: #ecf3f2;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 2px solid #ccc;
+  outline: none;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+#task-list li:hover {
+  background-color: #8e77aa;
+  transform: scale(1.02);
+}
+
+.layout {
+  padding-top: 70px;
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+}
+
+input[type="text"] {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 2px solid #ccc;
+  outline: none;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  font-family: var(--fuente-principal);
+}
+
+button {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  background-color: var(--color-principal);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--fuente-principal);
+}
+
+button:hover {
+  background-color: #155056;
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+#task-form {
+  display: flex;
+  gap: 10px;
+}
+
+
+@media(max-width: 600px) {
+  body {
+    flex-direction: column;
+  }
+
+  aside {
+    width: 100%;
+  }
+}
