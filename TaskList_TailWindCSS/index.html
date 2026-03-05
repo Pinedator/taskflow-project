@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Lista</title>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script>
+		tailwind.config = {
+			darkMode: 'class',
+			theme: {
+				extend: {},
+			}
+		}
+	</script>
+</head>
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
+	<header
+		class="fixed top-0 left-0 w-full bg-indigo-800 dark:bg-indigo-900 text-white p-4 shadow-md flex justify-between items-center z-50">
+		<h1 class="flex-1 text-center text-xl font-semibold">Lista de Tareas</h1>
+		<button id="theme-toggle"
+			class="bg-white dark:bg gray-700 text gray-800 dark:text-gray-200 px-3 py-1 rounded-md transition transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring_indigo-500">
+			🌙
+		</button>
+	</header>
+	<div class="layout flex pt-20 px-4 gap-4 max-w-4xl mx-auto w-full flex-col md:flex-row items-start h-[calc(100vh-5rem)]">
+		<aside class="bg-indigo-200 dark:bg-indigo-800 p-4 rounded-lg md:w-56 w-full mb-4 md:mb-0 flex-shrink-0">
+			<input type="text" id="search-input" placeholder="Buscar tareas..."
+				class="w-full p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-gray-100 text-gray-900 transition focus:ring-indigo-500 focus:outline-none">
+		</aside>
+		<main class="flex-1 flex flex-col gap-4 overflow-y-auto">
+			<form id="task-form" class="flex gap-2">
+				<input type="text" id="task-input" placeholder="Nueva tarea..." required
+					class="flex-1 p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+				<button type="submit"
+					class="bg-indigo-700 dark:bg-indigo-600 text-white px-4 py-2 rounded-md font-semibold transition transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+					Añadir
+				</button>
+			</form>
+			<ul id="task-list" class="flex flex-col gap-2"></ul>
+		</main>
+	</div>
+	<script src="app.js"></script>
+</body>
+</html>
