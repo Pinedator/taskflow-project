@@ -37,7 +37,7 @@ console.log("4");
 ```
 **Resultado:** `1 → 4 → 3 → 2`
 
-## Segunfa prueba
+## Segunda prueba
 
 Voy a escribir 3 funciones JavaScript con errores intencionales y pedirle ambos asistentes que detecten y expliquen el bug
 
