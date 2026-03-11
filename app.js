@@ -16,131 +16,126 @@ const taskList = document.getElementById("task-list");
 const themeToggle = document.getElementById("theme-toggle");
 
 let tasks = [];
-let filtered = null; // Si hay filtro activo, representa la lista filtrada.
-
-// --- Inicialización al cargar la página ---
+let filtered = null; // Lista filtrada cuando hay búsqueda activa
+// ---------- Inicialización ----------
 document.addEventListener("DOMContentLoaded", () => {
-  // Restaurar modo oscuro si está guardado
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme === "dark") document.documentElement.classList.add("dark");
-  else document.documentElement.classList.remove("dark");
-
-  // Restaurar tareas
-  const savedTasks = localStorage.getItem("tasks");
-  tasks = savedTasks ? JSON.parse(savedTasks) : [];
+  initTheme();
+  initTasks();
+  initEvents();
+});
+const initTheme = () => {
+  const savedTheme = loadThemeFromStorage();
+  const isDark = savedTheme === "dark";
+  document.documentElement.classList.toggle("dark", isDark);
+};
+const initTasks = () => {
+  tasks = loadTasksFromStorage();
   renderTasks(tasks);
-});
-
-// --- Cambio de tema: Clara/Oscura ---
-themeToggle.addEventListener("click", () => {
+};
+const initEvents = () => {
+  themeToggle.addEventListener("click", handleThemeToggle);
+  form.addEventListener("submit", handleFormSubmit);
+  searchInput.addEventListener("input", handleSearchInput);
+  taskList.addEventListener("click", handleTaskListClick);
+};
+// ---------- Manejadores de eventos ----------
+const handleThemeToggle = () => {
   const isDark = document.documentElement.classList.toggle("dark");
-  localStorage.setItem("theme", isDark ? "dark" : "light");
-});
-
-// --- Añadir tarea ---
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
+  saveThemeToStorage(isDark ? "dark" : "light");
+};
+const handleFormSubmit = (event) => {
+  event.preventDefault();
   const taskText = input.value.trim();
   if (!taskText) return;
   addTask(taskText);
   input.value = "";
-  // Si había filtro, update el filtro actual
-  if (filtered !== null) applyFilter(searchInput.value);
-});
-
-// --- Filtro de búsqueda ---
-searchInput.addEventListener("input", () => {
+  if (filtered !== null) {
+    applyFilter(searchInput.value);
+  }
+};
+const handleSearchInput = () => {
   applyFilter(searchInput.value);
-});
-
-function applyFilter(query) {
-  const val = query.trim().toLowerCase();
-  if (!val) {
+};
+const handleTaskListClick = (event) => {
+  const deleteButton = event.target.closest("button[data-action='delete']");
+  if (!deleteButton) return;
+  const li = deleteButton.closest("li[data-id]");
+  if (!li) return;
+  const id = Number(li.dataset.id);
+  li.classList.add("opacity-50", "line-through");
+  setTimeout(() => {
+    deleteTask(id);
+  }, 200);
+};
+// ---------- Lógica de tareas ----------
+const applyFilter = (query) => {
+  const value = query.trim().toLowerCase();
+  if (!value) {
     filtered = null;
     renderTasks(tasks);
-  } else {
-    filtered = tasks.filter(task => task.text.toLowerCase().includes(val));
-    renderTasks(filtered);
+    return;
   }
-}
-
-// --- Añadir tarea ---
-function addTask(text) {
+  filtered = tasks.filter((task) =>
+    task.text.toLowerCase().includes(value)
+  );
+  renderTasks(filtered);
+};
+const addTask = (text) => {
   const task = { id: Date.now(), text };
   tasks.push(task);
   saveTasks();
   if (filtered !== null) {
-    // Mantener actualizado el filtro si está activado
     applyFilter(searchInput.value);
   } else {
     renderTasks(tasks);
   }
-}
-
-// --- Renderizado eficiente ---
-function renderTasks(taskArray) {
+};
+const renderTasks = (taskArray) => {
   taskList.innerHTML = "";
-  // Mejorar rendimiento: usar fragmento
   const fragment = document.createDocumentFragment();
-  taskArray.forEach(task => {
+  taskArray.forEach((task) => {
     const li = document.createElement("li");
     li.className =
       "flex justify-between items-center p-2 bg-indigo-700 dark:bg-indigo-600 text-white rounded-md transition-colors hover:bg-indigo-600 dark:hover:bg-indigo-500";
-    li.setAttribute("data-id", task.id);
-
-    // Sólo el texto, no usamos textContent en li para permitir boton inline
+    li.dataset.id = task.id;
     const span = document.createElement("span");
     span.textContent = task.text;
     span.className = "truncate pr-2";
     li.appendChild(span);
-
-    // Botón Eliminar
     const deleteBtn = document.createElement("button");
     deleteBtn.textContent = "Eliminar";
     deleteBtn.type = "button";
     deleteBtn.className =
       "ml-2 bg-red-600 dark:bg-red-500 px-2 py-1 rounded-md text-sm font-semibold transition-colors hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-400";
-    deleteBtn.setAttribute("data-action", "delete");
-
+    deleteBtn.dataset.action = "delete";
     li.appendChild(deleteBtn);
     fragment.appendChild(li);
   });
   taskList.appendChild(fragment);
-}
-
-// --- Eliminación de tareas (delegación de eventos, mejor performance) ---
-taskList.addEventListener("click", (e) => {
-  // Solo si dan click al botón eliminar
-  if (
-    e.target.matches("button[data-action='delete']") &&
-    e.target.parentElement
-  ) {
-    const li = e.target.parentElement;
-    const id = Number(li.getAttribute("data-id"));
-    // Feedback visual, luego eliminar y refrescar
-    li.classList.add("opacity-50", "line-through");
-    setTimeout(() => {
-      deleteTask(id);
-    }, 200);
+};
+const deleteTask = (id) => {
+  const index = tasks.findIndex((task) => task.id === id);
+  if (index === -1) return;
+  tasks.splice(index, 1);
+  saveTasks();
+  if (filtered !== null) {
+    applyFilter(searchInput.value);
+  } else {
+    renderTasks(tasks);
   }
-});
-
-function deleteTask(id) {
-  const idx = tasks.findIndex((task) => task.id === id);
-  if (idx !== -1) {
-    tasks.splice(idx, 1);
-    saveTasks();
-
-    // Si hay filtro, refrescar filtro activo
-    if (filtered !== null) {
-      applyFilter(searchInput.value);
-    } else {
-      renderTasks(tasks);
-    }
-  }
-}
-
-// --- Persistencia ---
-function saveTasks() {
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-}
+};
+// ---------- Persistencia ----------
+const loadThemeFromStorage = () => localStorage.getItem("theme");
+const saveThemeToStorage = (theme) => {
+  localStorage.setItem("theme", theme);
+};
+const loadTasksFromStorage = () => {
+  const savedTasks = localStorage.getItem("tasks");
+  return savedTasks ? JSON.parse(savedTasks) : [];
+};
+const saveTasksToStorage = (tasksToSave) => {
+  localStorage.setItem("tasks", JSON.stringify(tasksToSave));
+};
+const saveTasks = () => {
+  saveTasksToStorage(tasks);
+};
