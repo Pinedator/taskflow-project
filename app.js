@@ -23,15 +23,27 @@ document.addEventListener("DOMContentLoaded", () => {
   initTasks();
   initEvents();
 });
+
+/**
+ * Inicializa el tema (claro/oscuro) en base al almacenamiento local.
+ */
 const initTheme = () => {
   const savedTheme = loadThemeFromStorage();
   const isDark = savedTheme === "dark";
   document.documentElement.classList.toggle("dark", isDark);
 };
+
+/**
+ * Inicializa el array de tareas desde almacenamiento local y las renderiza.
+ */
 const initTasks = () => {
   tasks = loadTasksFromStorage();
   renderTasks(tasks);
 };
+
+/**
+ * Añade los event listeners principales del UI.
+ */
 const initEvents = () => {
   themeToggle.addEventListener("click", handleThemeToggle);
   form.addEventListener("submit", handleFormSubmit);
@@ -39,10 +51,18 @@ const initEvents = () => {
   taskList.addEventListener("click", handleTaskListClick);
 };
 // ---------- Manejadores de eventos ----------
+/**
+ * Cambia entre modo claro y oscuro, y guarda la preferencia.
+ */
 const handleThemeToggle = () => {
   const isDark = document.documentElement.classList.toggle("dark");
   saveThemeToStorage(isDark ? "dark" : "light");
 };
+
+/**
+ * Añade una nueva tarea cuando se envía el formulario.
+ * @param {Event} event
+ */
 const handleFormSubmit = (event) => {
   event.preventDefault();
   const taskText = input.value.trim();
@@ -53,9 +73,18 @@ const handleFormSubmit = (event) => {
     applyFilter(searchInput.value);
   }
 };
+
+/**
+ * Filtra las tareas según el texto de búsqueda.
+ */
 const handleSearchInput = () => {
   applyFilter(searchInput.value);
 };
+
+/**
+ * Maneja el clic en la lista de tareas para eliminar una tarea.
+ * @param {Event} event
+ */
 const handleTaskListClick = (event) => {
   const deleteButton = event.target.closest("button[data-action='delete']");
   if (!deleteButton) return;
@@ -68,6 +97,10 @@ const handleTaskListClick = (event) => {
   }, 200);
 };
 // ---------- Lógica de tareas ----------
+/**
+ * Filtra y renderiza las tareas según el texto dado.
+ * @param {string} query
+ */
 const applyFilter = (query) => {
   const value = query.trim().toLowerCase();
   if (!value) {
@@ -80,6 +113,11 @@ const applyFilter = (query) => {
   );
   renderTasks(filtered);
 };
+
+/**
+ * Añade una nueva tarea al array y actualiza el almacenamiento.
+ * @param {string} text
+ */
 const addTask = (text) => {
   const task = { id: Date.now(), text };
   tasks.push(task);
@@ -90,6 +128,11 @@ const addTask = (text) => {
     renderTasks(tasks);
   }
 };
+
+/**
+ * Renderiza la lista de tareas recibida en el DOM.
+ * @param {Array<{id: number, text: string}>} taskArray
+ */
 const renderTasks = (taskArray) => {
   taskList.innerHTML = "";
   const fragment = document.createDocumentFragment();
@@ -113,6 +156,11 @@ const renderTasks = (taskArray) => {
   });
   taskList.appendChild(fragment);
 };
+
+/**
+ * Elimina una tarea por id, actualiza el almacenamiento y renderiza.
+ * @param {number} id
+ */
 const deleteTask = (id) => {
   const index = tasks.findIndex((task) => task.id === id);
   if (index === -1) return;
@@ -125,17 +173,40 @@ const deleteTask = (id) => {
   }
 };
 // ---------- Persistencia ----------
+/**
+ * Obtiene el tema guardado desde localStorage.
+ * @returns {string|null}
+ */
 const loadThemeFromStorage = () => localStorage.getItem("theme");
+
+/**
+ * Guarda el tema actual en localStorage.
+ * @param {string} theme
+ */
 const saveThemeToStorage = (theme) => {
   localStorage.setItem("theme", theme);
 };
+
+/**
+ * Carga la lista de tareas desde localStorage.
+ * @returns {Array<{id: number, text: string}>}
+ */
 const loadTasksFromStorage = () => {
   const savedTasks = localStorage.getItem("tasks");
   return savedTasks ? JSON.parse(savedTasks) : [];
 };
+
+/**
+ * Guarda la lista de tareas especificada en localStorage.
+ * @param {Array<{id: number, text: string}>} tasksToSave
+ */
 const saveTasksToStorage = (tasksToSave) => {
   localStorage.setItem("tasks", JSON.stringify(tasksToSave));
 };
+
+/**
+ * Guarda el array de tareas actual en localStorage.
+ */
 const saveTasks = () => {
   saveTasksToStorage(tasks);
 };
