@@ -104,6 +104,16 @@ const handleTaskListClick = (event) => {
   if (action === "toggle-completed") {
     toggleTaskCompleted(id);
   }
+
+  if (action === "edit") {
+    const task = tasks.find((t) => t.id === id);
+    if (!task) return;
+    const newText = prompt("Editar tarea:", task.text);
+    if (newText === null) return;
+    const trimmed = newText.trim();
+    if (!trimmed) return;
+    editTask(id, trimmed);
+  }
 };
 // ---------- Lógica de tareas ----------
 /**
@@ -166,6 +176,14 @@ const renderTasks = (taskArray) => {
       "ml-2 bg-green-500 dark:bg-green-400 px-2 py-1 rounded-md text-sm font-semibold transition-colors hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-300";
     li.appendChild(toggleBtn);
 
+    const editBtn = document.createElement("button");
+    editBtn.type = "button";
+    editBtn.dataset.action = "edit";
+    editBtn.textContent = "Editar";
+    editBtn.className =
+      "ml-2 bg-yellow-400 dark:bg-yellow-300 text-gray-900 px-2 py-1 rounded-md text-sm font-semibold transition-colors hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-300";
+    li.appendChild(editBtn);
+
     const deleteBtn = document.createElement("button");
     deleteBtn.textContent = "Eliminar";
     deleteBtn.type = "button";
@@ -202,6 +220,23 @@ const toggleTaskCompleted = (id) => {
   const task = tasks.find((t) => t.id === id);
   if (!task) return;
   task.completed = !task.completed;
+  saveTasks();
+  if (filtered !== null) {
+    applyFilter(searchInput.value);
+  } else {
+    renderTasks(tasks);
+  }
+};
+
+/**
+ * Edita el texto de una tarea.
+ * @param {number} id
+ * @param {string} newText
+ */
+const editTask = (id, newText) => {
+  const task = tasks.find((t) => t.id === id);
+  if (!task) return;
+  task.text = newText;
   saveTasks();
   if (filtered !== null) {
     applyFilter(searchInput.value);
