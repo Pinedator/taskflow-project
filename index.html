@@ -27,19 +27,46 @@
 	
 	<main class="flex-1 pt-24 px-4 flex flex-col max-w-4xl mx-auto w-full">
 		<div class="flex flex-col md:flex-row gap-4 w-full">
-			<!-- Sidebar de búsqueda -->
-			<aside class="bg-indigo-200 dark:bg-indigo-800 p-4 rounded-lg md:w-60 w-full flex-shrink-0 mb-4 md:mb-0 self-start">
-				<input type="text" 
+			<!-- Sidebar de búsqueda y filtros -->
+			<aside class="bg-indigo-200 dark:bg-indigo-800 p-4 rounded-lg md:w-60 w-full flex-shrink-0 mb-4 md:mb-0 self-start space-y-4">
+				<input
+					type="text" 
 					id="search-input" 
 					placeholder="Buscar tareas..."
 					class="w-full p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 dark:text-gray-100 text-gray-900 transition focus:ring-indigo-500 focus:outline-none"
 				>
+				<div class="space-y-2">
+					<p class="text-xs font-semibold uppercase tracking-wide text-indigo-900 dark:text-indigo-100">Filtros</p>
+					<div class="flex flex-wrap gap-2">
+						<button
+							id="filter-all"
+							type="button"
+							class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-700 text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+						>
+							Todas
+						</button>
+						<button
+							id="filter-pending"
+							type="button"
+							class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+						>
+							Pendientes
+						</button>
+						<button
+							id="filter-completed"
+							type="button"
+							class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+						>
+							Completadas
+						</button>
+					</div>
+				</div>
 			</aside>
 
 			<!-- Sección tareas -->
 			<section class="flex-1 flex flex-col w-full">
 				<!-- Formulario nueva tarea (siempre visible y sin saltos) -->
-				<form id="task-form" class="flex items-center gap-2 mb-4 w-full">
+				<form id="task-form" class="flex items-center gap-2 mb-2 w-full">
 					<input type="text" id="task-input" placeholder="Nueva tarea..." required
 						class="flex-1 p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition focus:ring-2 focus:ring-indigo-500 focus:outline-none" autocomplete="off">
 					<button type="submit"
@@ -47,6 +74,23 @@
 						Añadir
 					</button>
 				</form>
+				<!-- Acciones sobre todas las tareas -->
+				<div class="flex flex-wrap gap-2 mb-4">
+					<button
+						id="complete-all"
+						type="button"
+						class="px-3 py-1 rounded-md text-xs md:text-sm font-semibold bg-green-600 text-white hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-400"
+					>
+						Marcar todas como completadas
+					</button>
+					<button
+						id="clear-completed"
+						type="button"
+						class="px-3 py-1 rounded-md text-xs md:text-sm font-semibold bg-red-600 text-white hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-400"
+					>
+						Borrar tareas completadas
+					</button>
+				</div>
 				<!-- Lista de tareas -->
 				<ul id="task-list" class="flex flex-col gap-2"></ul>
 			</section>
