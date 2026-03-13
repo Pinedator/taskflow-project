@@ -15,8 +15,15 @@ const searchInput = document.getElementById("search-input");
 const taskList = document.getElementById("task-list");
 const themeToggle = document.getElementById("theme-toggle");
 
+const filterAllBtn = document.getElementById("filter-all");
+const filterPendingBtn = document.getElementById("filter-pending");
+const filterCompletedBtn = document.getElementById("filter-completed");
+const completeAllBtn = document.getElementById("complete-all");
+const clearCompletedBtn = document.getElementById("clear-completed");
+
 let tasks = [];
-let filtered = null; // Lista filtrada cuando hay búsqueda activa
+let searchQuery = "";
+let statusFilter = "all"; // "all" | "pending" | "completed"
 // ---------- Inicialización ----------
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
@@ -49,6 +56,10 @@ const initEvents = () => {
   form.addEventListener("submit", handleFormSubmit);
   searchInput.addEventListener("input", handleSearchInput);
   taskList.addEventListener("click", handleTaskListClick);
+
+  filterAllBtn.addEventListener("click", () => setStatusFilter("all"));
+  filterPendingBtn.addEventListener("click", () => setStatusFilter("pending"));
+  filterCompletedBtn.addEventListener("click", () => setStatusFilter("completed"));
 };
 // ---------- Manejadores de eventos ----------
 /**
@@ -69,16 +80,14 @@ const handleFormSubmit = (event) => {
   if (!taskText) return;
   addTask(taskText);
   input.value = "";
-  if (filtered !== null) {
-    applyFilter(searchInput.value);
-  }
 };
 
 /**
  * Filtra las tareas según el texto de búsqueda.
  */
 const handleSearchInput = () => {
-  applyFilter(searchInput.value);
+  searchQuery = searchInput.value;
+  renderTasks(getVisibleTasks());
 };
 
 /**
@@ -117,20 +126,32 @@ const handleTaskListClick = (event) => {
 };
 // ---------- Lógica de tareas ----------
 /**
- * Filtra y renderiza las tareas según el texto dado.
- * @param {string} query
+ * Devuelve las tareas visibles según búsqueda + filtro de estado.
+ * @returns {Array<{id:number,text:string,completed:boolean}>}
  */
-const applyFilter = (query) => {
-  const value = query.trim().toLowerCase();
-  if (!value) {
-    filtered = null;
-    renderTasks(tasks);
-    return;
-  }
-  filtered = tasks.filter((task) =>
-    task.text.toLowerCase().includes(value)
-  );
-  renderTasks(filtered);
+const getVisibleTasks = () => {
+  const query = searchQuery.trim().toLowerCase();
+
+  return tasks.filter((task) => {
+    const matchesText = !query ? true : task.text.toLowerCase().includes(query);
+    const matchesStatus =
+      statusFilter === "all"
+        ? true
+        : statusFilter === "completed"
+          ? task.completed
+          : !task.completed;
+
+    return matchesText && matchesStatus;
+  });
+};
+
+/**
+ * Cambia el filtro de estado y vuelve a renderizar.
+ * @param {"all"|"pending"|"completed"} filter
+ */
+const setStatusFilter = (filter) => {
+  statusFilter = filter;
+  renderTasks(getVisibleTasks());
 };
 
 /**
@@ -141,11 +162,7 @@ const addTask = (text) => {
   const task = { id: Date.now(), text, completed: false };
   tasks.push(task);
   saveTasks();
-  if (filtered !== null) {
-    applyFilter(searchInput.value);
-  } else {
-    renderTasks(tasks);
-  }
+  renderTasks(getVisibleTasks());
 };
 
 /**
@@ -205,11 +222,7 @@ const deleteTask = (id) => {
   if (index === -1) return;
   tasks.splice(index, 1);
   saveTasks();
-  if (filtered !== null) {
-    applyFilter(searchInput.value);
-  } else {
-    renderTasks(tasks);
-  }
+  renderTasks(getVisibleTasks());
 };
 
 /**
@@ -221,11 +234,7 @@ const toggleTaskCompleted = (id) => {
   if (!task) return;
   task.completed = !task.completed;
   saveTasks();
-  if (filtered !== null) {
-    applyFilter(searchInput.value);
-  } else {
-    renderTasks(tasks);
-  }
+  renderTasks(getVisibleTasks());
 };
 
 /**
@@ -238,11 +247,7 @@ const editTask = (id, newText) => {
   if (!task) return;
   task.text = newText;
   saveTasks();
-  if (filtered !== null) {
-    applyFilter(searchInput.value);
-  } else {
-    renderTasks(tasks);
-  }
+  renderTasks(getVisibleTasks());
 };
 // ---------- Persistencia ----------
 /**
