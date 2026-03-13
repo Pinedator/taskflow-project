@@ -1,28 +1,64 @@
-# Taskflow Project
-El proyecto incluye:
-- Una página web estática enfocada en estructura y diseño.
-- Una aplicación interactiva que permite guardar datos usando almacenamiento local del navegador.
+# Taskflow Project (ToDoList WebApp)
 
-# ToDoList WebApp
+Aplicación web **sin backend** para gestionar tareas en el navegador. Guarda el estado en **LocalStorage**, incluye **modo oscuro**, **búsqueda**, **filtros por estado** y acciones masivas.
 
-Aplicación web para gestionar tareas de forma sencilla.  
-Permite crear, eliminar y mantener una lista de tareas con persistencia local en el navegador.
+## Qué incluye
 
-## 🔹 Tecnologías
+- **UI**: `index.html` (Tailwind vía CDN)
+- **Lógica**: `app.js` (JavaScript Vanilla)
+- **Estilos extra**: `styles.css` (si aplica en tu versión)
+- **Documentación**: `docs/`
+
+## Tecnologías
+
 - HTML
 - CSS
 - JavaScript (Vanilla)
-- LocalStorage para guardar los datos en el navegador
-- Tailwind CSS
+- Tailwind CSS (CDN)
+- LocalStorage
 
-## 🔹 Funcionalidades
-- Crear nuevas tareas
-- Eliminar tareas existentes
-- Los datos se guardan automáticamente en LocalStorage
-- Recuperación de tareas al recargar la página
-- Botón para cambiar entre modo claro y modo oscuro
+## Funcionalidades
 
-## 🔹 Cómo usar
-1. Clonar el repositorio:
-```bash
-git clone https://github.com/Pinedator/taskflow-project.git
+- **Crear tareas**
+- **Editar tareas**
+- **Eliminar tareas**
+- **Marcar tarea como completada / pendiente**
+- **Búsqueda** por texto
+- **Filtros**: ver **todas**, **pendientes** o **completadas**
+- **Acciones masivas**:
+  - marcar **todas** como completadas
+  - borrar **todas** las completadas
+- **Persistencia**: se conserva al recargar la página
+- **Modo claro/oscuro**
+
+## Cómo ejecutar
+
+No requiere instalación.
+
+- Abre `index.html` con doble clic, o con “Open with Live Server” (VSCode/Cursor).
+- La app funciona completamente en el navegador.
+
+## Estructura del proyecto
+
+```text
+taskflow-project/
+  index.html
+  app.js
+  styles.css
+  README.md
+  docs/
+```
+
+## Modelo de datos (LocalStorage)
+
+- **Clave `tasks`**: lista de tareas
+  - `id`: number
+  - `text`: string
+  - `completed`: boolean
+- **Clave `theme`**: `"dark"` | `"light"`
+
+## Documentación de funciones
+
+La referencia completa de funciones está en:
+
+- `docs/app-functions.md`
