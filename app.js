@@ -62,6 +62,7 @@ const initEvents = () => {
   filterCompletedBtn.addEventListener("click", () => setStatusFilter("completed"));
 
   completeAllBtn.addEventListener("click", handleCompleteAll);
+  clearCompletedBtn.addEventListener("click", handleClearCompleted);
 };
 // ---------- Manejadores de eventos ----------
 /**
@@ -264,6 +265,17 @@ const handleCompleteAll = () => {
     }
   });
   if (!changed) return;
+  saveTasks();
+  renderTasks(getVisibleTasks());
+};
+
+/**
+ * Elimina todas las tareas completadas.
+ */
+const handleClearCompleted = () => {
+  const hasCompleted = tasks.some((t) => t.completed);
+  if (!hasCompleted) return;
+  tasks = tasks.filter((t) => !t.completed);
   saveTasks();
   renderTasks(getVisibleTasks());
 };
