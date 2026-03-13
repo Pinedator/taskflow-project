@@ -86,15 +86,24 @@ const handleSearchInput = () => {
  * @param {Event} event
  */
 const handleTaskListClick = (event) => {
-  const deleteButton = event.target.closest("button[data-action='delete']");
-  if (!deleteButton) return;
-  const li = deleteButton.closest("li[data-id]");
+  const button = event.target.closest("button[data-action]");
+  if (!button) return;
+  const li = button.closest("li[data-id]");
   if (!li) return;
   const id = Number(li.dataset.id);
-  li.classList.add("opacity-50", "line-through");
-  setTimeout(() => {
-    deleteTask(id);
-  }, 200);
+
+  const action = button.dataset.action;
+
+  if (action === "delete") {
+    li.classList.add("opacity-50", "line-through");
+    setTimeout(() => {
+      deleteTask(id);
+    }, 200);
+  }
+
+  if (action === "toggle-completed") {
+    toggleTaskCompleted(id);
+  }
 };
 // ---------- Lógica de tareas ----------
 /**
@@ -119,7 +128,7 @@ const applyFilter = (query) => {
  * @param {string} text
  */
 const addTask = (text) => {
-  const task = { id: Date.now(), text };
+  const task = { id: Date.now(), text, completed: false };
   tasks.push(task);
   saveTasks();
   if (filtered !== null) {
@@ -131,7 +140,7 @@ const addTask = (text) => {
 
 /**
  * Renderiza la lista de tareas recibida en el DOM.
- * @param {Array<{id: number, text: string}>} taskArray
+ * @param {Array<{id: number, text: string, completed?: boolean}>} taskArray
  */
 const renderTasks = (taskArray) => {
   taskList.innerHTML = "";
@@ -144,7 +153,19 @@ const renderTasks = (taskArray) => {
     const span = document.createElement("span");
     span.textContent = task.text;
     span.className = "truncate pr-2";
+    if (task.completed) {
+      span.classList.add("line-through", "opacity-70");
+    }
     li.appendChild(span);
+
+    const toggleBtn = document.createElement("button");
+    toggleBtn.type = "button";
+    toggleBtn.dataset.action = "toggle-completed";
+    toggleBtn.textContent = task.completed ? "Pendiente" : "Completar";
+    toggleBtn.className =
+      "ml-2 bg-green-500 dark:bg-green-400 px-2 py-1 rounded-md text-sm font-semibold transition-colors hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-300";
+    li.appendChild(toggleBtn);
+
     const deleteBtn = document.createElement("button");
     deleteBtn.textContent = "Eliminar";
     deleteBtn.type = "button";
@@ -165,6 +186,22 @@ const deleteTask = (id) => {
   const index = tasks.findIndex((task) => task.id === id);
   if (index === -1) return;
   tasks.splice(index, 1);
+  saveTasks();
+  if (filtered !== null) {
+    applyFilter(searchInput.value);
+  } else {
+    renderTasks(tasks);
+  }
+};
+
+/**
+ * Marca o desmarca una tarea como completada.
+ * @param {number} id
+ */
+const toggleTaskCompleted = (id) => {
+  const task = tasks.find((t) => t.id === id);
+  if (!task) return;
+  task.completed = !task.completed;
   saveTasks();
   if (filtered !== null) {
     applyFilter(searchInput.value);
@@ -193,7 +230,14 @@ const saveThemeToStorage = (theme) => {
  */
 const loadTasksFromStorage = () => {
   const savedTasks = localStorage.getItem("tasks");
-  return savedTasks ? JSON.parse(savedTasks) : [];
+  const parsed = savedTasks ? JSON.parse(savedTasks) : [];
+  return Array.isArray(parsed)
+    ? parsed.map((t) => ({
+        id: t.id,
+        text: t.text,
+        completed: Boolean(t.completed),
+      }))
+    : [];
 };
 
 /**
