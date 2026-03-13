@@ -60,6 +60,8 @@ const initEvents = () => {
   filterAllBtn.addEventListener("click", () => setStatusFilter("all"));
   filterPendingBtn.addEventListener("click", () => setStatusFilter("pending"));
   filterCompletedBtn.addEventListener("click", () => setStatusFilter("completed"));
+
+  completeAllBtn.addEventListener("click", handleCompleteAll);
 };
 // ---------- Manejadores de eventos ----------
 /**
@@ -246,6 +248,22 @@ const editTask = (id, newText) => {
   const task = tasks.find((t) => t.id === id);
   if (!task) return;
   task.text = newText;
+  saveTasks();
+  renderTasks(getVisibleTasks());
+};
+
+/**
+ * Marca todas las tareas como completadas.
+ */
+const handleCompleteAll = () => {
+  let changed = false;
+  tasks.forEach((task) => {
+    if (!task.completed) {
+      task.completed = true;
+      changed = true;
+    }
+  });
+  if (!changed) return;
   saveTasks();
   renderTasks(getVisibleTasks());
 };
