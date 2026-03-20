@@ -1,13 +1,3 @@
-// ==== Mejoras implementadas ====
-// 1. Unificación de listeners DOMContentLoaded.
-// 2. Función única para inicialización y restauración de estado (modo y tareas).
-// 3. Mejor legibilidad, comentarios consistentes y nombres claros.
-// 4. Uso de delegación de eventos para eliminar tareas (mejor rendimiento).
-// 5. Eliminar renderizaciones duplicadas innecesarias.
-// 6. Preferencia por funciones flecha donde mejora la lectura.
-// 7. Separar UI y lógica de persistencia.
-// 8. Previene repintados completos evitables.
-// =================================
 
 const form = document.getElementById("task-form");
 const input = document.getElementById("task-input");
@@ -20,8 +10,11 @@ const filterPendingBtn = document.getElementById("filter-pending");
 const filterCompletedBtn = document.getElementById("filter-completed");
 const completeAllBtn = document.getElementById("complete-all");
 const clearCompletedBtn = document.getElementById("clear-completed");
+const sortChronoBtn = document.getElementById("sort-chrono");
+const sortAlphaBtn = document.getElementById("sort-alpha");
 
 let tasks = [];
+let sortOrder = "chrono";
 let searchQuery = "";
 let statusFilter = "all"; // "all" | "pending" | "completed"
 // ---------- Inicialización ----------
@@ -63,6 +56,9 @@ const initEvents = () => {
 
   completeAllBtn.addEventListener("click", handleCompleteAll);
   clearCompletedBtn.addEventListener("click", handleClearCompleted);
+
+  sortChronoBtn.addEventListener("click", () => setSortOrder("chrono"));
+  sortAlphaBtn.addEventListener("click", () => setSortOrder("alpha"));
 };
 // ---------- Manejadores de eventos ----------
 /**
@@ -132,10 +128,44 @@ const handleTaskListClick = (event) => {
  * Devuelve las tareas visibles según búsqueda + filtro de estado.
  * @returns {Array<{id:number,text:string,completed:boolean}>}
  */
+// Ordena el array según el criterio activo
+const getSortedTasks = (taskArray) => {
+  if (sortOrder === "alpha") {
+    return [...taskArray].sort((a, b) =>
+      a.text.localeCompare(b.text, "es", { sensitivity: "base" })
+    );
+  }
+  // "chrono": el id es Date.now(), así que orden ascendente = orden de creación
+  return [...taskArray].sort((a, b) => a.id - b.id);
+};
+
+// Cambia el criterio de orden y actualiza los estilos de los botones
+const setSortOrder = (order) => {
+  sortOrder = order;
+  // Actualiza clases de los botones (activo = fondo oscuro, inactivo = fondo claro)
+  sortChronoBtn.className = sortChronoBtn.className.replace(
+    order === "chrono"
+      ? "bg-indigo-100 text-indigo-800"
+      : "bg-indigo-700 text-white",
+    order === "chrono"
+      ? "bg-indigo-700 text-white"
+      : "bg-indigo-100 text-indigo-800"
+  );
+  sortAlphaBtn.className = sortAlphaBtn.className.replace(
+    order === "alpha"
+      ? "bg-indigo-100 text-indigo-800"
+      : "bg-indigo-700 text-white",
+    order === "alpha"
+      ? "bg-indigo-700 text-white"
+      : "bg-indigo-100 text-indigo-800"
+  );
+  renderTasks(getVisibleTasks());
+};
+
 const getVisibleTasks = () => {
   const query = searchQuery.trim().toLowerCase();
 
-  return tasks.filter((task) => {
+  const filtered = tasks.filter((task) => {
     const matchesText = !query ? true : task.text.toLowerCase().includes(query);
     const matchesStatus =
       statusFilter === "all"
@@ -146,6 +176,7 @@ const getVisibleTasks = () => {
 
     return matchesText && matchesStatus;
   });
+   return getSortedTasks(filtered);
 };
 
 /**
@@ -178,7 +209,10 @@ const renderTasks = (taskArray) => {
   taskArray.forEach((task) => {
     const li = document.createElement("li");
     li.className =
-      "flex justify-between items-center p-2 bg-indigo-700 dark:bg-indigo-600 text-white rounded-md transition-colors hover:bg-indigo-600 dark:hover:bg-indigo-500";
+      `flex justify-between items-center p-2 rounded-md transition-colors ${task.completed
+        ? "bg-indigo-400 dark:bg-indigo-300 hover:bg-indigo-300 dark:hover:bg-indigo-200"
+        : "bg-indigo-700 dark:bg-indigo-600 hover:bg-indigo-600 dark:hover:bg-indigo-500"
+      } text-white`;
     li.dataset.id = task.id;
     const span = document.createElement("span");
     span.textContent = task.text;
@@ -188,29 +222,40 @@ const renderTasks = (taskArray) => {
     }
     li.appendChild(span);
 
+    const btnGroup = document.createElement("div");
+    btnGroup.className = "flex items-center gap-2 shrink-0"
+
     const toggleBtn = document.createElement("button");
     toggleBtn.type = "button";
     toggleBtn.dataset.action = "toggle-completed";
     toggleBtn.textContent = task.completed ? "Pendiente" : "Completar";
     toggleBtn.className =
-      "ml-2 bg-green-500 dark:bg-green-400 px-2 py-1 rounded-md text-sm font-semibold transition-colors hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-300";
-    li.appendChild(toggleBtn);
+      `px-2 py-1 rounded-md text-sm font-semibold transition-colors hover:scale-105 focus:outline-none focus:ring-2 ${task.completed
+        ? "bg-orange-500 focus:ring-orange-300 text-gray-900 focus:ring-yellow-300"
+        : "bg-green-500 dark:bg-green-400 text-white focus:ring-green-300"
+      }`;
+
 
     const editBtn = document.createElement("button");
     editBtn.type = "button";
     editBtn.dataset.action = "edit";
     editBtn.textContent = "Editar";
     editBtn.className =
-      "ml-2 bg-yellow-400 dark:bg-yellow-300 text-gray-900 px-2 py-1 rounded-md text-sm font-semibold transition-colors hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-300";
-    li.appendChild(editBtn);
+      " bg-yellow-400 dark:bg-yellow-300 text-gray-900 px-2 py-1 rounded-md text-sm font-semibold transition-colors hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-300";
+
 
     const deleteBtn = document.createElement("button");
     deleteBtn.textContent = "Eliminar";
     deleteBtn.type = "button";
     deleteBtn.className =
-      "ml-2 bg-red-600 dark:bg-red-500 px-2 py-1 rounded-md text-sm font-semibold transition-colors hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-400";
+      " bg-red-600 dark:bg-red-500 px-2 py-1 rounded-md text-sm font-semibold transition-colors hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-400";
     deleteBtn.dataset.action = "delete";
-    li.appendChild(deleteBtn);
+
+    btnGroup.appendChild(toggleBtn);
+    btnGroup.appendChild(editBtn);
+    btnGroup.appendChild(deleteBtn);
+
+    li.appendChild(btnGroup);
     fragment.appendChild(li);
   });
   taskList.appendChild(fragment);
@@ -303,10 +348,10 @@ const loadTasksFromStorage = () => {
   const parsed = savedTasks ? JSON.parse(savedTasks) : [];
   return Array.isArray(parsed)
     ? parsed.map((t) => ({
-        id: t.id,
-        text: t.text,
-        completed: Boolean(t.completed),
-      }))
+      id: t.id,
+      text: t.text,
+      completed: Boolean(t.completed),
+    }))
     : [];
 };
 
