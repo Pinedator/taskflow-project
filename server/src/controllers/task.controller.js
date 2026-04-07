@@ -41,10 +41,7 @@ const deleteTask = (req, res) => {
     taskService.eliminarTarea(id);
     res.status(204).send();
   } catch (error) {
-    if (error.message === 'NOT_FOUND') {
-      return res.status(404).json({ error: 'Tarea no encontrada' });
-    }
-    res.status(500).json({ error: 'Error interno del servidor' });
+    next(error) // se lo pasa al middleware global
   }
 };
 
