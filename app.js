@@ -1,4 +1,4 @@
-import { obtenerTareas, crearTarea, eliminarTarea, toggleTarea, editarTarea } from './api/client.js';
+import { obtenerTareas, crearTarea, eliminarTarea, toggleTarea, editarTarea } from './network/client.js';
 
 const form = document.getElementById("task-form");
 const input = document.getElementById("task-input");
