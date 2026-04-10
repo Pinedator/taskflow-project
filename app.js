@@ -223,7 +223,7 @@ const renderTasks = (taskArray) => {
   const fragment = document.createDocumentFragment();
   taskArray.forEach((task) => {
     const li = document.createElement("li");
-    li.className = `flex justify-between items-center p-2 rounded-md transition-colors ${
+    li.className = `flex flex-wrap justify-between items-center gap-y-2 p-2 rounded-md transition-colors ${
       task.completed
         ? "bg-indigo-400 dark:bg-indigo-300 hover:bg-indigo-300 dark:hover:bg-indigo-200"
         : "bg-indigo-700 dark:bg-indigo-600 hover:bg-indigo-600 dark:hover:bg-indigo-500"
@@ -232,18 +232,18 @@ const renderTasks = (taskArray) => {
 
     const span = document.createElement("span");
     span.textContent = task.text;
-    span.className = "truncate pr-2";
+    span.className = "tmin-w-0 flex-1 pr-2 break-words";
     if (task.completed) span.classList.add("line-through", "opacity-70");
     li.appendChild(span);
 
     const btnGroup = document.createElement("div");
-    btnGroup.className = "flex items-center gap-2 shrink-0";
+    btnGroup.className = "flex items-center gap-1 shrink-0";
 
     const toggleBtn = document.createElement("button");
     toggleBtn.type = "button";
     toggleBtn.dataset.action = "toggle-completed";
     toggleBtn.textContent = task.completed ? "Pendiente" : "Completar";
-    toggleBtn.className = `px-2 py-1 rounded-md text-sm font-semibold transition-colors hover:scale-105 focus:outline-none focus:ring-2 ${
+    toggleBtn.className = `px-2 py-1 rounded-md text-xs font-semibold transition-colors hover:scale-105 focus:outline-none focus:ring-2 ${
       task.completed
         ? "bg-orange-500 text-gray-900 focus:ring-orange-300"
         : "bg-green-500 dark:bg-green-400 text-white focus:ring-green-300"
@@ -253,13 +253,13 @@ const renderTasks = (taskArray) => {
     editBtn.type = "button";
     editBtn.dataset.action = "edit";
     editBtn.textContent = "Editar";
-    editBtn.className = "bg-yellow-400 dark:bg-yellow-300 text-gray-900 px-2 py-1 rounded-md text-sm font-semibold transition-colors hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-300";
+    editBtn.className = "bg-yellow-400 dark:bg-yellow-300 text-gray-900 px-2 py-1 rounded-md text-xs font-semibold transition-colors hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-300";
 
     const deleteBtn = document.createElement("button");
     deleteBtn.type = "button";
     deleteBtn.dataset.action = "delete";
     deleteBtn.textContent = "Eliminar";
-    deleteBtn.className = "bg-red-600 dark:bg-red-500 px-2 py-1 rounded-md text-sm font-semibold transition-colors hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-400";
+    deleteBtn.className = "bg-red-600 dark:bg-red-500 px-2 py-1 rounded-md text-xs font-semibold transition-colors hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-400";
 
     btnGroup.appendChild(toggleBtn);
     btnGroup.appendChild(editBtn);
